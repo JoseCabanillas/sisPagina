@@ -2,51 +2,31 @@ name: Alerta Dinámica de Tareas
 
 on:
   schedule:
-    # Se ejecuta todos los días a las 19:09 UTC (14:09 Hora Perú)
-    - cron: '44 21 * * *'
+    - cron: '58 21 * * *'   # 13:00 UTC = 08:00 hora Perú
   workflow_dispatch:
 
 jobs:
   enviar-alerta:
     runs-on: ubuntu-latest
     steps:
-      - name: Descargar repositorio
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Instalar librerías
-        run: pip install requests
+      - run: pip install requests
 
-      - name: Leer tareas y enviar alertas
+      - name: Enviar alertas
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python alertas.py
+
+      - name: Avisar si falló
+        if: failure()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: |
-          python -c '
-          import csv
-          import requests
-          from datetime import datetime, date
-
-          topico_ntfy = "mis_alertas"
-          url = f"https://ntfy.sh/{topico_ntfy}"
-
-          with open("tareas.csv", mode="r", encoding="utf-8") as archivo:
-              lector = csv.DictReader(archivo)
-              
-              for fila in lector:
-                  tarea = fila["tarea"]
-                  responsable = fila["responsable"]
-                  fecha_limite_str = fila["fecha_limite"]
-
-                  fecha_limite = datetime.strptime(fecha_limite_str, "%Y-%m-%d").date()
-                  hoy = date.today()
-                  dias_restantes = (fecha_limite - hoy).days
-
-                  mensaje = f"""📌 Tarea: {tarea}
-          👤 Responsable: {responsable}
-          📅 Vencimiento: {fecha_limite.strftime("%d/%m/%Y")}
-          ⏳ Días restantes: {dias_restantes} días"""
-
-                  requests.post(url, data=mensaje.encode("utf-8"))
-          '
+          curl -s -H "Title: Falló el workflow de alertas" -H "Priority: high" -H "Tags: x" \
+            -d "Revisa la pestaña Actions del repositorio." \
+            "https://ntfy.sh/$NTFY_TOPIC"
