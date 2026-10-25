@@ -3,7 +3,7 @@ name: Alerta Dinámica de Tareas
 on:
   schedule:
     # Se ejecuta todos los días a las 19:09 UTC (14:09 Hora Perú)
-    - cron: '9 19 * * *'
+    - cron: '44 21 * * *'
   workflow_dispatch:
 
 jobs:
