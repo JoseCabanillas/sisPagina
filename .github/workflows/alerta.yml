@@ -28,7 +28,7 @@ jobs:
           import requests
           from datetime import datetime, date
 
-          topico_ntfy = "AQUI_TU_TOPICO"  # <--- Cambia por tu tópico de ntfy
+          topico_ntfy = "mis_alertas"  # <--- Cambia por tu tópico de ntfy
           url = f"https://ntfy.sh/{topico_ntfy}"
 
           # Abrir el archivo CSV
