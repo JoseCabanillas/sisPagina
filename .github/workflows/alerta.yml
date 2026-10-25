@@ -2,8 +2,8 @@ name: Alerta Dinámica de Tareas
 
 on:
   schedule:
-    # 21:58 UTC = 16:58 (4:58 p. m.) hora Perú
-    - cron: '58 21 * * *'
+    # Se ejecuta todos los días a las 19:09 UTC (14:09 Hora Perú)
+    - cron: '44 21 * * *'
   workflow_dispatch:
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
 
           with open("tareas.csv", mode="r", encoding="utf-8") as archivo:
               lector = csv.DictReader(archivo)
-
+              
               for fila in lector:
                   tarea = fila["tarea"]
                   responsable = fila["responsable"]
@@ -48,6 +48,5 @@ jobs:
           📅 Vencimiento: {fecha_limite.strftime("%d/%m/%Y")}
           ⏳ Días restantes: {dias_restantes} días"""
 
-                  r = requests.post(url, data=mensaje.encode("utf-8"))
-                  print(tarea, r.status_code)
+                  requests.post(url, data=mensaje.encode("utf-8"))
           '
