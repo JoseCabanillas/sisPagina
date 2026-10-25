@@ -1,4 +1,4 @@
-name: Alerta Automática de Tareas
+name: Alerta Dinámica de Tareas
 
 on:
   schedule:
@@ -10,6 +10,9 @@ jobs:
   enviar-alerta:
     runs-on: ubuntu-latest
     steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
       - name: Configurar Python
         uses: actions/setup-python@v4
         with:
@@ -18,33 +21,36 @@ jobs:
       - name: Instalar librerías
         run: pip install requests
 
-      - name: Calcular fechas y enviar alerta
+      - name: Leer tareas y enviar alertas
         run: |
           python -c '
+          import csv
           import requests
           from datetime import datetime, date
 
-          # ----------------------------------------------------
-          # CONFIGURACIÓN DE LA TAREA (Ajusta estos datos)
-          # ----------------------------------------------------
-          tarea = "Entrega del informe final"
-          responsable = "José Luis"
-          fecha_limite_str = "2026-11-15"  # Formato: AAAA-MM-DD
-          topico_ntfy = "mis_alertas"     # Tu tópico exacto de ntfy
-          # ----------------------------------------------------
+          topico_ntfy = "AQUI_TU_TOPICO"  # <--- Cambia por tu tópico de ntfy
+          url = f"https://ntfy.sh/{topico_ntfy}"
 
-          # Cálculo automático de días restantes
-          fecha_limite = datetime.strptime(fecha_limite_str, "%Y-%m-%d").date()
-          hoy = date.today()
-          dias_restantes = (fecha_limite - hoy).days
+          # Abrir el archivo CSV
+          with open("tareas.csv", mode="r", encoding="utf-8") as archivo:
+              lector = csv.DictReader(archivo)
+              
+              for fila in lector:
+                  tarea = fila["tarea"]
+                  responsable = fila["responsable"]
+                  fecha_limite_str = fila["fecha_limite"]
 
-          # Formato del mensaje
-          mensaje = f"""📌 Tarea: {tarea}
+                  # Cálculo automático de días restantes
+                  fecha_limite = datetime.strptime(fecha_limite_str, "%Y-%m-%d").date()
+                  hoy = date.today()
+                  dias_restantes = (fecha_limite - hoy).days
+
+                  # Formato del mensaje para cada tarea
+                  mensaje = f"""📌 Tarea: {tarea}
           👤 Responsable: {responsable}
-          📅 Fecha de vencimiento: {fecha_limite.strftime("%d/%m/%Y")}
+          📅 Vencimiento: {fecha_limite.strftime("%d/%m/%Y")}
           ⏳ Días restantes: {dias_restantes} días"""
 
-          # Envío de la notificación
-          url = f"https://ntfy.sh/{topico_ntfy}"
-          requests.post(url, data=mensaje.encode("utf-8"))
+                  # Enviar alerta por cada tarea
+                  requests.post(url, data=mensaje.encode("utf-8"))
           '
