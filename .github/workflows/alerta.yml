@@ -30,7 +30,7 @@ jobs:
           tarea = "Entrega del informe final"
           responsable = "José Luis"
           fecha_limite_str = "2026-11-15"  # Formato: AAAA-MM-DD
-          topico_ntfy = "AQUI_TU_TOPICO"     # Tu tópico exacto de ntfy
+          topico_ntfy = "mis_alertas"     # Tu tópico exacto de ntfy
           # ----------------------------------------------------
 
           # Cálculo automático de días restantes
