@@ -3,7 +3,7 @@ name: Alerta Dinámica de Tareas
 on:
   schedule:
     # 21:58 UTC = 16:58 (4:58 p. m.) hora Perú
-    - cron: '22 22 * * *'
+    - cron: '34 22 * * *'
   workflow_dispatch:
 
 jobs:
