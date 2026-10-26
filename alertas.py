@@ -17,14 +17,15 @@ with open("tareas.csv", mode="r", encoding="utf-8") as archivo:
         hoy = date.today()
         dias_restantes = (fecha_limite - hoy).days
 
+        # El mensaje sí puede tener emojis sin problema
         mensaje = f"""👤 Responsable: {responsable}
 📅 Vencimiento: {fecha_limite.strftime("%d/%m/%Y")}
 ⏳ Días restantes: {dias_restantes} días"""
 
-        # Añadimos cabeceras para forzar la notificación inmediata y darle título
+        # En el Title QUITAMOS el emoji para evitar el error de codificación
         headers = {
-            "Title": f"📌 Tarea: {tarea}",
-            "Priority": "high",  # O "urgent" para que suene/vibre fuerte
+            "Title": f"Tarea: {tarea}",  
+            "Priority": "high",
             "Tags": "bell"
         }
 
