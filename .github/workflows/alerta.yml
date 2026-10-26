@@ -21,32 +21,5 @@ jobs:
       - name: Instalar librerías
         run: pip install requests
 
-      - name: Leer tareas y enviar alertas
-        run: |
-          python -c '
-          import csv
-          import requests
-          from datetime import datetime, date
-
-          topico_ntfy = "mis_alertas"
-          url = f"https://ntfy.sh/{topico_ntfy}"
-
-          with open("tareas.csv", mode="r", encoding="utf-8") as archivo:
-              lector = csv.DictReader(archivo)
-              
-              for fila in lector:
-                  tarea = fila["tarea"]
-                  responsable = fila["responsable"]
-                  fecha_limite_str = fila["fecha_limite"]
-
-                  fecha_limite = datetime.strptime(fecha_limite_str, "%Y-%m-%d").date()
-                  hoy = date.today()
-                  dias_restantes = (fecha_limite - hoy).days
-
-                  mensaje = f"""📌 Tarea: {tarea}
-          👤 Responsable: {responsable}
-          📅 Vencimiento: {fecha_limite.strftime("%d/%m/%Y")}
-          ⏳ Días restantes: {dias_restantes} días"""
-
-                  requests.post(url, data=mensaje.encode("utf-8"))
-          '
+      - name: Ejecutar script de alertas
+        run: python alertas.py
